@@ -1,56 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const localImageVariants: Record<string, { width:number; height:number; webp:string; avif?:string }> = {
-  "/hero-mm.png": { width:1672, height:941, webp:"/hero-mm-960.webp 960w, /hero-mm-1280.webp 1280w, /hero-mm-1672.webp 1672w", avif:"/hero-mm-960.avif 960w, /hero-mm-1280.avif 1280w, /hero-mm-1672.avif 1672w" },
-  "/carpentry-detail.png": { width:1536, height:1024, webp:"/carpentry-detail-480.webp 480w, /carpentry-detail-768.webp 768w, /carpentry-detail-1024.webp 1024w, /carpentry-detail-1280.webp 1280w" },
-  "/interior-mm.png": { width:1672, height:941, webp:"/interior-mm-640.webp 640w, /interior-mm-960.webp 960w, /interior-mm-1280.webp 1280w, /interior-mm-1672.webp 1672w", avif:"/interior-mm-640.avif 640w, /interior-mm-960.avif 960w, /interior-mm-1280.avif 1280w, /interior-mm-1672.avif 1672w" },
-  "/interior-feature.png": { width:1672, height:941, webp:"/interior-feature-640.webp 640w, /interior-feature-960.webp 960w, /interior-feature-1280.webp 1280w, /interior-feature-1672.webp 1672w" },
-  "/mm-logo.png": { width:640, height:640, webp:"/mm-logo-96.webp 96w, /mm-logo-128.webp 128w" },
-};
-
-function pexelsUrl(src:string, width:number) { return `${src}&auto=compress&w=${width}`; }
-
-function OptimizedImage({ src, alt, sizes, eager = false, style }:{ src:string; alt:string; sizes:string; eager?:boolean; style?:React.CSSProperties }) {
-  const local = localImageVariants[src];
-  if (local) return <picture className="responsive-picture">
-    {local.avif && <source type="image/avif" srcSet={local.avif} sizes={sizes} />}
-    <source type="image/webp" srcSet={local.webp} sizes={sizes} />
-    <img src={src} alt={alt} width={local.width} height={local.height} sizes={sizes} loading={eager ? "eager" : "lazy"} fetchPriority="auto" decoding="async" style={style} />
-  </picture>;
-  if (src.startsWith("https://images.pexels.com/")) return <img
-    src={pexelsUrl(src, 1200)}
-    srcSet={[480, 768, 1200].map(width => `${pexelsUrl(src, width)} ${width}w`).join(", ")}
-    sizes={sizes}
-    alt={alt}
-    loading={eager ? "eager" : "lazy"}
-    fetchPriority="low"
-    decoding="async"
-    style={style}
-  />;
-  return <img src={src} alt={alt} sizes={sizes} loading={eager ? "eager" : "lazy"} fetchPriority="low" decoding="async" style={style} />;
-}
-
-function ViewportOptimizedImage(props:{ src:string; alt:string; sizes:string; style?:React.CSSProperties }) {
-  const marker = useRef<HTMLSpanElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const element = marker.current;
-    if (!element || !("IntersectionObserver" in window)) { setVisible(true); return; }
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setVisible(true); observer.disconnect(); }
-    }, { rootMargin:"240px" });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-  return <span className="deferred-image" ref={marker}>{visible && <OptimizedImage {...props} />}</span>;
-}
-
-const navItems = [
-  ["Inicio", "#inicio"], ["Construcción", "#construccion"], ["Carpintería", "#carpinteria"],
-  ["Interiorismo", "#interiorismo"], ["Proyectos", "#proyectos"], ["Nosotros", "#nosotros"], ["Contacto", "#contacto"],
-];
+import { ContactCTA, Footer, Header, ViewportOptimizedImage } from "../components/mm-shared";
 
 const construction = [
   { title: "Obra y estructura", copy: "Bases firmes para grandes ideas.", image: "https://images.pexels.com/photos/9784169/pexels-photo-9784169.jpeg?cs=srgb&fm=jpg" },
@@ -79,15 +30,6 @@ const projects = [
   { name: "Suite Serena", discipline: "Interiorismo", image: "/interior-feature.png", location: "Ubicación demo", size: "standard" },
 ];
 
-function Header() {
-  return <header className="site-header">
-    <a className="brand" href="#inicio" aria-label="MM Grupo Creativo, inicio"><OptimizedImage src="/mm-logo.png" alt="" sizes="54px" eager /><span>Grupo Creativo</span></a>
-    <nav aria-label="Navegación principal">{navItems.map(([label, href]) => <a key={href} href={href}>{label}</a>)}</nav>
-    <a className="header-cta" href="#contacto">Cotiza tu proyecto <span aria-hidden="true">→</span></a>
-    <details className="mobile-menu"><summary aria-label="Abrir menú"><span /><span /><span /></summary><div>{navItems.map(([label, href]) => <a key={href} href={href} onClick={(event) => (event.currentTarget.closest("details") as HTMLDetailsElement | null)?.removeAttribute("open")}>{label}</a>)}</div></details>
-  </header>;
-}
-
 function HeroStory() {
   return <section className="hero" id="inicio">
     <div className="hero-copy">
@@ -106,9 +48,9 @@ function HeroStory() {
     <div className="hero-actions hero-actions-mobile"><a className="button button-dark" href="#contacto">Cotiza tu proyecto <span>→</span></a><a className="button button-outline" href="#proyectos">Ver proyectos <span>→</span></a></div>
     <p className="vertical-note">Ideas<br />Materiales<br />Espacios<br />Personas</p>
     <div className="hero-disciplines" aria-label="Disciplinas">
-      <a href="#construccion"><b>01</b><span>Construcción, adecuaciones y acondicionamiento.</span></a>
-      <a href="#carpinteria"><b>02</b><span>Carpintería especializada.</span></a>
-      <a href="#interiorismo"><b>03</b><span>Decoración e Interiorismo.</span></a>
+      <a href="/construccion"><b>01</b><span>Construcción, adecuaciones y acondicionamiento.<small>Conocer servicios →</small></span></a>
+      <a href="/carpinteria"><b>02</b><span>Carpintería especializada.<small>Conocer servicios →</small></span></a>
+      <a href="/interiorismo"><b>03</b><span>Decoración e Interiorismo.<small>Conocer servicios →</small></span></a>
     </div>
   </section>;
 }
@@ -124,7 +66,7 @@ function ConstructionCarousel() {
   };
   useEffect(() => { if (paused) return; const id = window.setInterval(() => go(active + 1), 6000); return () => window.clearInterval(id); }, [active, paused]);
   return <section className="section construction-section" id="construccion">
-    <div className="section-intro"><p className="section-number">01 <span /></p><h2>Construcción, adecuaciones<br /><em>y acondicionamiento.</em></h2><p>Espacios funcionales, seguros y listos para impulsar lo que viene.</p><a className="text-link" href="#proyectos">Ver proyectos <span>→</span></a></div>
+    <div className="section-intro"><p className="section-number">01 <span /></p><h2>Construcción, adecuaciones<br /><em>y acondicionamiento.</em></h2><p>Espacios funcionales, seguros y listos para impulsar lo que viene.</p><div className="section-links"><a className="text-link" href="/construccion">Conocer servicios <span>→</span></a><a href="#proyectos">Ver proyectos →</a></div></div>
     <div className="carousel-shell" onPointerDown={() => setPaused(true)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       <div className="construction-track" ref={track}>{construction.map((item, i) => <article className={`construction-card ${i === active ? "is-active" : ""}`} key={item.title}>
         <ViewportOptimizedImage src={item.image} alt={item.title} sizes="(max-width: 720px) 84vw, (max-width: 980px) 54vw, 28vw" /><div className="card-shade" /><div className="card-copy"><b>{String(i + 1).padStart(2,"0")}</b><h3>{item.title}</h3><p>{item.copy}</p></div>
@@ -136,7 +78,7 @@ function ConstructionCarousel() {
 
 function CarpentryGallery() {
   return <section className="section carpentry-section" id="carpinteria">
-    <div className="section-heading"><p className="section-number">02 <span /></p><h2>Carpintería<br /><em>especializada.</em></h2><p>Diseño a medida. Materiales que se sienten.<br />Detalles que perduran.</p></div>
+    <div className="section-heading"><p className="section-number">02 <span /></p><h2>Carpintería<br /><em>especializada.</em></h2><p>Diseño a medida. Materiales que se sienten.<br />Detalles que perduran.</p><div className="section-links"><a className="text-link" href="/carpinteria">Conocer servicios <span>→</span></a><a href="#proyectos">Ver proyectos →</a></div></div>
     <p className="edge-note">Madera<br />Diseño<br />Funcionalidad<br />Espacios únicos</p>
     <div className="carpentry-grid">{carpentry.map((item, i) => <article key={item.title} className={i === 2 ? "featured" : ""}><ViewportOptimizedImage src={item.image} alt={item.title} sizes="(max-width: 720px) 78vw, 24vw" style={{objectPosition: i === 2 ? "13% center" : "center"}} /><div className="card-shade" /><div className="card-copy"><b>{String(i + 1).padStart(2,"0")}</b><h3>{item.title}</h3></div></article>)}</div>
   </section>;
@@ -144,7 +86,7 @@ function CarpentryGallery() {
 
 function InteriorismFeature() {
   return <section className="section interior-section" id="interiorismo">
-    <div className="interior-copy"><p className="section-number">03 <span /></p><h2>Decoración e<br /><em>Interiorismo.</em></h2><span className="hairline" /><p>Espacios que se sienten<br />tan bien como se ven.</p></div>
+    <div className="interior-copy"><p className="section-number">03 <span /></p><h2>Decoración e<br /><em>Interiorismo.</em></h2><span className="hairline" /><p>Espacios que se sienten<br />tan bien como se ven.</p><div className="section-links"><a className="text-link" href="/interiorismo">Conocer servicios <span>→</span></a><a href="#proyectos">Ver proyectos →</a></div></div>
     <div className="interior-art"><ViewportOptimizedImage src="/interior-mm.png" alt="Sala, comedor e iluminación integrados en un interior contemporáneo" sizes="(max-width: 720px) 140vw, (max-width: 980px) 92vw, 82vw" /><span className="project-name">Estancia contemporánea <i>Proyecto demo</i></span></div>
     <div className="interior-thumbs"><span>Residencias</span><span>Oficinas</span><span>Comercios</span><span>Hoteles</span></div>
   </section>;
@@ -167,8 +109,4 @@ function AboutSection() {
   </section>;
 }
 
-function ContactCTA() {
-  return <><section className="contact-section" id="contacto"><p>Tu espacio puede ser el siguiente.</p><h2>Hablemos de<br /><em>tu proyecto.</em></h2><a className="button button-light" href="mailto:contacto@mmgrupocreativo.mx">Cotiza tu proyecto <span>→</span></a></section><footer><a className="brand footer-brand" href="#inicio"><OptimizedImage src="/mm-logo.png" alt="" sizes="54px" /><span>Grupo Creativo</span></a><p>Construcción · Carpintería · Interiorismo</p><a href="#inicio">Volver arriba ↑</a></footer></>;
-}
-
-export default function Home() { return <main><Header /><HeroStory /><ConstructionCarousel /><CarpentryGallery /><InteriorismFeature /><ProjectMasonry /><AboutSection /><ContactCTA /></main>; }
+export default function Home() { return <main><Header /><HeroStory /><ConstructionCarousel /><CarpentryGallery /><InteriorismFeature /><ProjectMasonry /><AboutSection /><ContactCTA title="Hablemos de|tu proyecto." /><Footer /></main>; }
