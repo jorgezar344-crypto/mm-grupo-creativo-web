@@ -31,7 +31,7 @@ const projects = [
   { name: "Estancia Horizonte", discipline: "Interiorismo", image: "/interior-feature.png", location: "Ubicación demo", size: "wide" },
   { name: "Vestidor Roble", discipline: "Carpintería", image: "/carpentry-detail.png", location: "Ubicación demo", size: "standard" },
   { name: "Estructura Patio", discipline: "Construcción", image: "https://images.pexels.com/photos/9784169/pexels-photo-9784169.jpeg?cs=srgb&fm=jpg", location: "Ubicación demo", size: "standard" },
-  { name: "Suite Serena", discipline: "Interiorismo", image: "https://images.splitshire.com/full/Luxurious-Penthouse-Living-Room_6fd58a.png", location: "Ubicación demo", size: "standard" },
+  { name: "Suite Serena", discipline: "Interiorismo", image: "/interior-feature.png", location: "Ubicación demo", size: "standard" },
 ];
 
 function Header() {
@@ -49,9 +49,13 @@ function HeroStory() {
       <p className="eyebrow">Diseñamos · Construimos · Transformamos</p>
       <h1>Espacios<br /><em>que trascienden.</em></h1><span className="hairline" />
       <p className="hero-subtitle">De la idea al espacio terminado.</p>
-      <div className="hero-actions"><a className="button button-dark" href="#contacto">Cotiza tu proyecto <span>→</span></a><a className="text-link" href="#proyectos">Ver proyectos <span>↘</span></a></div>
+      <div className="hero-actions hero-actions-desktop"><a className="button button-dark" href="#contacto">Cotiza tu proyecto <span>→</span></a><a className="text-link" href="#proyectos">Ver proyectos <span>↘</span></a></div>
     </div>
-    <img className="hero-image" src="/hero-mm.png" alt="Construcción, carpintería e interiorismo integrados en un mismo espacio" />
+    <picture className="hero-picture">
+      <source media="(max-width: 767px)" srcSet="/hero-mm-mobile.png" />
+      <img className="hero-image" src="/hero-mm.png" alt="Construcción, carpintería e interiorismo integrados en un mismo espacio" />
+    </picture>
+    <div className="hero-actions hero-actions-mobile"><a className="button button-dark" href="#contacto">Cotiza tu proyecto <span>→</span></a><a className="button button-outline" href="#proyectos">Ver proyectos <span>→</span></a></div>
     <p className="vertical-note">Ideas<br />Materiales<br />Espacios<br />Personas</p>
     <div className="hero-disciplines" aria-label="Disciplinas">
       <a href="#construccion"><b>01</b><span>Construcción, adecuaciones y acondicionamiento.</span></a>
